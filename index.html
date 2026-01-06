@@ -1,3 +1,5 @@
+index.html
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -29,5 +31,209 @@
       border-right:1px solid rgba(15,23,42,0.06);
       display:flex;
       flex-direction:column;
-     *
-
+      box-shadow: 0 1px 0 rgba(15,23,42,0.03) inset;
+    }
+    .sidebar .header {
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      border-bottom:1px solid rgba(15,23,42,0.03);
+    }
+    .sidebar .title {
+      font-weight:600;
+      font-size:15px;
+    }
+    .sidebar .hint {
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    /* Scrollable buttons list */
+    .button-list {
+      padding:12px;
+      overflow-y:auto;
+      flex:1 1 auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      scroll-behavior:smooth;
+    }
+    .btn {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-align:left;
+      width:100%;
+      padding:10px 14px;
+      background:var(--card);
+      border:1px solid rgba(15,23,42,0.06);
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+      color:#0f1724;
+      transition:transform .06s ease, box-shadow .06s ease;
+      box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+    }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(3,6,23,0.06); }
+    .btn.active {
+      border-color:var(--accent);
+      background:linear-gradient(180deg,#e7f1ff,#ffffff);
+      box-shadow: 0 4px 18px rgba(3,102,214,0.12);
+      color:var(--accent);
+    }
+
+    /* Avatar-specific styles */
+    .avatar-img {
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      overflow:hidden;
+      flex:0 0 40px;
+      display:inline-block;
+      background:linear-gradient(180deg,#e6eefb,#dbeeff);
+      border:1px solid rgba(15,23,42,0.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .avatar-img svg { width:60%; height:60%; fill:#0f1724; opacity:0.9; }
+
+    .btn .btn-text {
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* Right content */
+    .main {
+      flex:1 1 auto;
+      display:flex;
+      flex-direction:column;
+      padding:18px;
+      gap:12px;
+      min-width:0;
+    }
+    .main .controls {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .primary {
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .secondary {
+      background:transparent;
+      border:1px solid rgba(15,23,42,0.08);
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .panel {
+      background:var(--card);
+      border-radius:10px;
+      padding:18px;
+      box-shadow:0 1px 0 rgba(15,23,42,0.03) inset, 0 6px 18px rgba(2,6,23,0.04);
+      flex:1 1 auto;
+      overflow:auto;
+    }
+
+    /* Small screens */
+    @media (max-width:720px){
+      .app { flex-direction:column; }
+      .sidebar { width:100%; max-height:220px; order:2; border-right:none; border-top:1px solid rgba(15,23,42,0.03); }
+      .main { order:1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="MVP App with scrollable buttons sidebar">
+    <aside class="sidebar" aria-label="Buttons sidebar">
+      <div class="header">
+        <div>
+          <div class="title">Items</div>
+          <div class="hint">Scrollable list on the left</div>
+        </div>
+        <div id="countIndicator" style="font-size:13px;color:var(--muted)">1</div>
+      </div>
+
+      <div class="button-list" id="buttonList" tabindex="0" aria-label="Scrollable buttons list">
+        <!-- Initially only one button as requested; first button shows a user photo icon -->
+        <button class="btn active avatar" data-id="1" id="btn-1" aria-label="Your profile (selected)">
+          <span class="avatar-img" aria-hidden="true">
+            <!-- Simple person SVG icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/>
+            </svg>
+          </span>
+          <span class="btn-text">You</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="controls" aria-hidden="false">
+        <button class="primary" id="addBtn">Add item</button>
+        <button class="secondary" id="removeBtn">Remove last</button>
+        <div style="margin-left:auto;color:var(--muted);font-size:13px">Selected: <span id="selectedLabel">1</span></div>
+      </div>
+
+      <section class="panel" id="contentPanel" aria-live="polite">
+        <h2 id="contentTitle">Content for You</h2>
+        <p id="contentBody">This is the main area. Click any button on the left to change the content. The sidebar is vertically scrollable; currently there is 1 button (the first is your profile icon).</p>
+
+        <hr style="margin:18px 0;border:none;border-top:1px solid rgba(15,23,42,0.06)">
+
+        <p style="color:var(--muted);font-size:14px">Notes:
+          <ul style="margin:8px 0 0 18px;color:var(--muted);">
+            <li>The left column is a scrollable list of buttons.</li>
+            <li>The first (and initial) button displays a user photo icon.</li>
+            <li>Initial number of buttons = 1 (as requested). Add or remove items using the controls above.</li>
+          </ul>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Simple behavior: clicking buttons updates right-hand content.
+    (function(){
+      const buttonList = document.getElementById('buttonList');
+      const contentTitle = document.getElementById('contentTitle');
+      const contentBody = document.getElementById('contentBody');
+      const selectedLabel = document.getElementById('selectedLabel');
+      const addBtn = document.getElementById('addBtn');
+      const removeBtn = document.getElementById('removeBtn');
+      const countIndicator = document.getElementById('countIndicator');
+
+      let count = 1; // initial number of buttons
+
+      function setActiveButton(btn) {
+        document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const id = btn.getAttribute('data-id');
+        selectedLabel.textContent = id;
+        // If first button (id === "1"), show "You" content; otherwise generic
+        if (id === "1") {
+          contentTitle.textContent = 'Content for You';
+          contentBody.textContent = 'This area shows your profile content (item #' + id + ').';
+        } else {
+          contentTitle.textContent = 'Content for Button ' + id;
+          contentBody.textContent = 'You selected item #' + id + '. This area can hold any content for that item.';
+        }
+        // ensure the active button is visible in the scroll container
+        btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
+      }
+
+      // Delegate clicks
+      buttonList.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn');
+        if (!btn) return;
+
