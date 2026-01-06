@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CUET Document Helper</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; margin: 0; }
+    .container { max-width: 640px; margin: 32px auto; background: #fff; border-radius: 10px; padding: 24px 20px 32px 20px; box-shadow: 0 8px 24px #0001; }
+    h1 { color: #1766b2; font-size: 2rem; margin-bottom: 8px; }
+    h2 { font-size: 1.18rem; color: #234; margin-bottom: 24px; }
+    .doc-card { background: #eaf4fb; border-radius: 8px; margin-bottom: 22px; padding: 20px 18px; box-shadow: 0 2px 8px #0002; }
+    .doc-title { font-weight: 600; font-size: 1.13rem; margin-bottom: 6px; }
+    .doc-desc { font-size: 0.98rem; margin-bottom: 10px; color: #333; }
+    .upload-btn { border-radius: 5px; border: none; background: #1766b2; color: #fff; font-size: 1rem; padding: 7px 20px; margin-bottom: 11px; cursor: pointer; }
+    .result { font-size: 0.97rem; margin-top: 7px; padding: 7px; border-radius: 5px; }
+    .result.success { background: #cbf1cd; color: #295a07; }
+    .result.error { background: #ffeaea; color: #ad3838; }
+    @media (max-width: 700px) {
+      .container { max-width: 98vw; padding: 12px 3vw 24px 3vw; }
+    }
+    footer { color: #7b7b7b; text-align: center; font-size: 0.93rem; margin-top: 20px; }
+    a { color: #186ee0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>CUET Document Helper</h1>
+  <h2>Instantly check &amp; validate your document uploads for CUET 2026.</h2>
+  <div id="app"></div>
+  <footer>
+    Made for students | <a href="https://www.cuet.com/cuet-documents-required" target="_blank">CUET Official Docs</a>
+  </footer>
+</div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script>
+const { useState } = React;
+
+const docSpecs = [
+  {
+    title: "Passport-size Photograph",
+    accept: ".jpg,.jpeg",
+    formats: ["jpg","jpeg"],
+    minKb: 10,
+    maxKb: 200,
+    desc: "Face (80%) & ears visible, white background. JPG/JPEG, 10–200kb.",
+  },
+  {
+    title: "Signature",
+    accept: ".jpg,.jpeg",
+    formats: ["jpg", "jpeg"],
+    minKb: 10,
+    maxKb: 50,
+    desc: "Clear, non-blurry, JPG/JPEG, 4–30kb.",
+  },
+  {
+    title: "Category Certificate",
+    accept: ".pdf",
+    formats: ["pdf"],
+    minKb: 50,
+    maxKb: 300,
+    desc: "SC/ST/OBC/EWS, PDF, 50–300kb.",
+  },
+  {
+    title: "PwBD Certificate",
+    accept: ".pdf",
+    formats: ["pdf"],
+    minKb: 50,
+    maxKb: 300,
+    desc: "Disability certificate, PDF, 50–300kb.",
+  },
+  {
+    title: "Class 10/12 Marksheet",
+    accept: ".pdf",
+    formats: ["pdf"],
+    minKb: 50,
+    maxKb: 300,
+    desc: "PDF, max 300kb. Upload if requested.",
+  }
+];
+
+function DocCard({ spec }) {
+  const [result, setResult] = useState("");
+  const [resultType, setResultType] = useState("");
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Validate extension
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!spec.formats.includes(ext)) {
+      setResultType("error");
+      setResult("Invalid file type! Acceptable: " + spec.formats.join(", ").toUpperCase());
+      return;
+    }
+    // Validate size
+    const sizeKb = file.size / 1024;
+    if (sizeKb < spec.minKb || sizeKb > spec.maxKb) {
+      setResultType("error");
+      setResult(`Incorrect file size! Must be ${spec.minKb}-${spec.maxKb}kb. Yours is ${sizeKb.toFixed(2)}kb.`);
+      return;
+    }
+    setResultType("success");
+    setResult("✓ Valid! Ready to upload to CUET portal.");
+  }
+  return (
+    <div className="doc-card">
+      <div className="doc-title">{spec.title}</div>
+      <div className="doc-desc">{spec.desc}</div>
+      <input
+        type="file"
+        accept={spec.accept}
+        onChange={handleFile}
+        style={{ display: "none" }}
+        id={spec.title.replace(/\s/g,'')+"Input"}
+      />
+      <label htmlFor={spec.title.replace(/\s/g,'')+"Input"}>
+        <button className="upload-btn">
+          Choose File
+        </button>
+      </label>
+      {result && (
+        <div className={`result ${resultType}`}>{result}</div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      {docSpecs.map(spec =>
+        <DocCard key={spec.title} spec={spec} />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
+</script>
+</body>
+</html>
